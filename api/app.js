@@ -8,7 +8,6 @@ const morgan = require('morgan');
 const indexRoutes = require('./routes/');
 const apiRoutes = require('./routes/api');
 
-
 // variable to enable global error logging
 const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'true';
 

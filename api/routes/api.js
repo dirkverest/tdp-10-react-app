@@ -1,12 +1,19 @@
 const express = require('express');
 const router = express.Router();
+const cors = require('cors');
 const { check, validationResult } = require('express-validator');
 const auth = require('basic-auth');
 const bcrypt = require('bcryptjs');
 const {User, Course} = require('../db/models');
 
+// Cors origin config
+const corsOptions = {
+    origin: 'http://localhost:3000',
+  };
+
+
 // Parse JSON 
-router.use(express.json());
+router.use(cors(corsOptions), express.json());
 
 /**
  * Async Await Handler
