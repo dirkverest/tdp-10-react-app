@@ -1,9 +1,6 @@
 import React from 'react';
 
 export default class CreateCourse extends React.Component {
-    constructor() {
-        super();
-    }
 
     render() {
         return(

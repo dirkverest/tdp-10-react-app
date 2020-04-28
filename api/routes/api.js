@@ -133,7 +133,7 @@ router.post('/users',[
         .withMessage('This email is already registered.'),
     check('password')
         .exists({checkNull: true, checkFalsy: true})
-        .withMessage('Please enter a password')
+        .withMessage('Please enter a password.')
 ], asyncHandler( async (req, res) => {
     const valErrors = validationResult(req);
     if (!valErrors.isEmpty()) {
