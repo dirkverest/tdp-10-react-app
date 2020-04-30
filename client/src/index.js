@@ -1,20 +1,19 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './stylesheets/index.css';
-import {Provider} from './Context';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
+import { Provider } from "./Context";
+import App from "./App";
+import * as serviceWorker from "./serviceWorker";
+// Load normalize css
+import "./stylesheets/normalize.css";
 
+// Render App component inside provider to the index element with class "root"
 ReactDOM.render(
   <React.StrictMode>
     <Provider>
       <App />
     </Provider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
 serviceWorker.unregister();

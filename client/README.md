@@ -1,3 +1,11 @@
+# Project comments
+Please find all comments inside the files
+
+
+
+
+# Create React App
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

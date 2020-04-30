@@ -1,10 +1,12 @@
-import React from 'react';
-import { Redirect } from 'react-router-dom';
+import React, { useEffect } from "react";
+import { Redirect } from "react-router-dom";
 
-// Auto executing function to execute context function without error
-export default ({context}) => {
-    context.actions.signOut();   
-    return(
-        <Redirect to="/" />
-    );
-}
+export default ({ context }) => {
+  // side effect of function: Similar to componentDidMount and componentDidUpdate
+  useEffect(() => {
+    // Call signout function in data.js
+    context.actions.signOut();
+  });
+  // Return Redirect
+  return <Redirect to="/" />;
+};

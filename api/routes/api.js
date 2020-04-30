@@ -9,6 +9,7 @@ const {User, Course} = require('../db/models');
 // Cors origin config
 const corsOptions = {
     origin: 'http://localhost:3000',
+    exposedHeaders:['Location'],
   };
 
 

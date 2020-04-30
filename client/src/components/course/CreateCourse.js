@@ -1,58 +1,103 @@
-import React from 'react';
+import React from "react";
+import Form from "./Form";
 
 export default class CreateCourse extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      error: null,
+      title: "",
+      description: "",
+      estimatedTime: "",
+      materialsNeeded: "",
+      userId: "",
+      userInfo: {
+        fistName: "",
+        lastName: "",
+      },
+    };
+    // Bind functions to this
+    this.handleFormInputChange = this.handleFormInputChange.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.cancel = this.cancel.bind(this);
+  }
 
-    render() {
-        return(
-            <div className="bounds course--detail">
-                <h1>Create Course</h1>
-                <div>
-                    <div>
-                        <h2 className="validation--errors--label">Validation errors</h2>
-                        <div className="validation-errors">
-                        <ul>
-                            <li>Please provide a value for "Title"</li>
-                            <li>Please provide a value for "Description"</li>
-                        </ul>
-                        </div>
-                    </div>
-                    <form>
-                        <div className="grid-66">
-                            <div className="course--header">
-                                <h4 className="course--label">Course</h4>
-                                <div>
-                                    <input id="title" name="title" type="text" className="input-title course--title--input" placeHolder="Course title..." value="" />
-                                </div>
-                                <p>By Joe Smith</p>
-                            </div>
-                                <div className="course--description">
-                                    <div>
-                                        <textarea id="description" name="description" className="" placeHolder="Course description..." />
-                                    </div>
-                            </div>
-                        </div>
-                        <div className="grid-25 grid-right">
-                            <div className="course--stats">
-                                <ul className="course--stats--list">
-                                    <li className="course--stats--list--item">
-                                        <h4>Estimated Time</h4>
-                                        <div>
-                                            <input id="estimatedTime" name="estimatedTime" type="text" className="course--time--input" placeHolder="Hours" value="" />
-                                        </div>
-                                    </li>
-                                    <li className="course--stats--list--item">
-                                        <h4>Materials Needed</h4>
-                                        <div>
-                                            <textarea id="materialsNeeded" name="materialsNeeded" className="" placeHolder="List materials..." />
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div className="grid-100 pad-bottom"><button className="button" type="submit">Create Course</button><button className="button button-secondary" onclick="event.preventDefault(); location.href='index.html';">Cancel</button></div>
-                    </form>
-                </div>
-            </div>
-        )
+  /**
+   * On mount: if authenticated user, set state of user variables
+   * else, push forbidden path (redundant security)
+   */
+  componentDidMount() {
+    const { authenticatedUser } = this.props.context;
+    if (authenticatedUser) {
+      this.setState({
+        userId: authenticatedUser.id,
+        userInfo: {
+          fistName: authenticatedUser.firstName,
+          lastName: authenticatedUser.lastName,
+        },
+      });
+    } else {
+      this.props.history.push("../../forbidden");
     }
+  }
+
+  // Save form input in state
+  handleFormInputChange(e) {
+    const name = e.target.name;
+    const value = e.target.value;
+    this.setState({
+      [name]: value,
+    });
+  }
+
+  // Create and submit course object to correct data.js function
+  handleSubmit() {
+    const { context } = this.props;
+    const course = {
+      id: this.state.id,
+      title: this.state.title,
+      description: this.state.description,
+      estimatedTime: this.state.estimatedTime,
+      materialsNeeded: this.state.materialsNeeded,
+      userId: this.state.userId,
+    };
+
+    context.data
+      .courseCreate(course)
+      // If error object returns, set error state
+      .then(
+        (response) => {
+          if (response.errors) {
+            this.setState({
+              errors: response.errors,
+            });
+            // Else redirect based on returned Location Header
+          } else {
+            this.props.history.push(response.headers.get("Location"));
+          }
+        },
+        (error) => {
+          this.props.history.push("../../error");
+        }
+      );
+  }
+
+  // Link to homepage by pushing home path to the top of the react router history object
+  cancel(e) {
+    this.props.history.push("/");
+  }
+
+  // RENDER FORM COMPONENT
+  render() {
+    return (
+      <Form
+        formTitle="Create Course"
+        courseInfo={this.state}
+        inputChange={this.handleFormInputChange}
+        submitText="Update Course"
+        submit={this.handleSubmit}
+        cancel={this.cancel}
+      />
+    );
+  }
 }

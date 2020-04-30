@@ -16,13 +16,13 @@ export default function Header(props) {
           <nav>
               { authUser ?
                 <React.Fragment>
-                  <span>Welcome, {authUser.firstName}</span>
-                  <NavLink exact to="/signout" className="signout" activeClassName="active" >Sign Out</NavLink>
+                  <span>Welcome, {authUser.firstName} {authUser.lastName}</span>
+                  <NavLink exact to="/signout" className="signout">Sign Out</NavLink>
                 </React.Fragment>
                 :
                 <React.Fragment>
-                  <NavLink exact to="/signup" className="signup" activeClassName="active" >Sign Up</NavLink>
-                  <NavLink exact to="/signin" className="signin" activeClassName="active" >Sign In</NavLink>
+                  <NavLink exact to="/signup" className="signup">Sign Up</NavLink>
+                  <NavLink exact to="/signin" className="signin">Sign In</NavLink>
                 </React.Fragment>
               }
           </nav>

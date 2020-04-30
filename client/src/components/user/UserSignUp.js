@@ -1,158 +1,166 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import Form from './Form';
-import ValidationErrors from '../ValidationErrors';
+import React from "react";
+import { Link } from "react-router-dom";
+import Form from "./Form";
+import ValidationErrors from "../ValidationErrors";
 
 export default class UserSignUp extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            firstName:"",
-            lastName: "",
-            emailAddress: "",
-            password: "",
-            confirmPassword: "",
-            errors: null,
-        };
-        this.handleFormInputChange = this.handleFormInputChange.bind(this);
-        this.matchPasswords = this.matchPasswords.bind(this);
-        this.submit = this.submit.bind(this);
-        this.cancel = this.cancel.bind(this);
+  constructor(props) {
+    super(props);
+    this.state = {
+      firstName: "",
+      lastName: "",
+      emailAddress: "",
+      password: "",
+      confirmPassword: "",
+      errors: null,
+    };
+    this.handleFormInputChange = this.handleFormInputChange.bind(this);
+    this.matchPasswords = this.matchPasswords.bind(this);
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleCancel = this.handleCancel.bind(this);
+  }
+
+  /**
+ * matchPasswords() returns a new element
+ * based on the input of the password en confirm password field
+ */
+  matchPasswords(password, confirmPassword) {
+    if (password !== confirmPassword) {
+      const passwordMatch = ["Passwords don't match."];
+      return passwordMatch;
     }
+  }
 
-    // Confirm password match
-    matchPasswords(pass, confirmPass) {
-        if (pass !== confirmPass) {
-            const passwordMatch = ["Passwords don't match."];
-            return passwordMatch
-        }
-    }
+  // Save form input on change in state
+  handleFormInputChange(e) {
+    const name = e.target.name;
+    const value = e.target.value;
+    this.setState({
+      [name]: value,
+    });
+  }
 
-    // Save form input in state
-    handleFormInputChange(e) {
-        const name = e.target.name;
-        const value = e.target.value;
-        this.setState({
-                [name]: value
-        });
-    }
+  // Submit form
+  handleSubmit() {
+    const { context } = this.props;
+    const {
+      firstName,
+      lastName,
+      emailAddress,
+      password,
+      confirmPassword,
+    } = this.state;
+    const noPasswordMatch = this.matchPasswords(password, confirmPassword);
+    const user = {
+      firstName,
+      lastName,
+      emailAddress,
+      password,
+    };
 
-    // Submit form
-    submit() {
-        const {context} = this.props;
-        const {
-            firstName,
-            lastName,
-            emailAddress,
-            password,
-            confirmPassword
-        } = this.state;
-        const noPasswordMatch = this.matchPasswords(password, confirmPassword);
-        const user = {
-            firstName,
-            lastName,
-            emailAddress,
-            password,
-        }
-
-        // Reset error state
-        this.setState({
-            errors: null,
-        })
-
-        if (noPasswordMatch) {
+    if (noPasswordMatch) {
+      this.setState({
+        errors: noPasswordMatch,
+      });
+    } else {
+      context.data.createUser(user).then(
+        (response) => {
+          if (response.Errors) {
             this.setState({
-                errors: noPasswordMatch,
-            })
-        } else {
-            context.data.createUser(user)
-                .then(errors => {
-                    if (errors.length) {
-                        this.setState({
-                            errors: errors,
-                        })
-                    } else {
-                        // Auto sign in after sign up
-                        context.actions.signIn(emailAddress, password);
-                        this.props.history.push('/');
-                    }
-                })
-                .catch( err => {
-                    console.log(err);
-                    this.props.history.push('./error');
-                })
+              errors: response.Errors,
+            });
+          } else {
+            // Auto sign in after sign up
+            context.actions.signIn(emailAddress, password);
+            // this.props.history.push(response.headers.get('Location'));
+            this.props.history.push("/");
+          }
+        },
+        (error) => {
+          this.props.history.push("../../error");
         }
+      );
     }
+  }
 
-    // Cancel form input
-    cancel(e) {
-        this.setState({
-            firstName:"",
-            lastName: "",
-            emailAddress: "",
-            password: "",
-            confirmPassword: "",
-            errors: null,
-        });
-        // Link to homepage by pushing home path to the top of the react router history object
-        this.props.history.push('/');
-    }
+  // Cancel form input
+  handleCancel(e) {
+    this.setState({
+      firstName: "",
+      lastName: "",
+      emailAddress: "",
+      password: "",
+      confirmPassword: "",
+      errors: null,
+    });
+    // Link to homepage by pushing home path to the top of the react router history object
+    this.props.history.push("/");
+  }
 
-    // RENDER COMPONENT: UserSignUp
-    render() {
-        return(
-            <div className="bounds">
-                <div className="grid-33 centered signin">
-                    <h1>Sign Up</h1>
-                    <ValidationErrors errors={this.state.errors} />
-                    <Form
-                        errors={this.state.errors}
-                        cancel={this.cancel}
-                        submit={this.submit}
-                        submitButtonText="Sign Up"
-                        elements={() => (
-                            <React.Fragment>
-                                <input 
-                                    id="firstName" 
-                                    name="firstName" 
-                                    type="text"
-                                    placeholder="First Name" 
-                                    value={this.state.firstName}
-                                    onChange={this.handleFormInputChange} />
-                                <input 
-                                    id="lastName" 
-                                    name="lastName" 
-                                    type="text" 
-                                    placeholder="Last Name" 
-                                    value={this.state.lastName}
-                                    onChange={this.handleFormInputChange} />
-                                <input 
-                                    id="emailAddress" 
-                                    name="emailAddress" 
-                                    type="text" 
-                                    placeholder="Email Address" 
-                                    value={this.state.emailAddress} 
-                                    onChange={this.handleFormInputChange} />
-                                <input 
-                                    id="password" 
-                                    name="password" 
-                                    type="password" 
-                                    placeholder="Password" 
-                                    value={this.state.password}
-                                    onChange={this.handleFormInputChange} />
-                                <input 
-                                    id="confirmPassword" 
-                                    name="confirmPassword" 
-                                    type="password" 
-                                    placeholder="Confirm Password"
-                                    value={this.state.confirmPassword}
-                                    onChange={this.handleFormInputChange} />
-                            </React.Fragment>
-                        )} />
-                    <p>&nbsp;</p>
-                    <p>Already have a user account? <Link to={"/signin"}>Click here</Link> to sign in!</p>
-                </div>
-            </div>
-        )
-    }
+  // Render UserSignUp Component with form and error
+  render() {
+    return (
+      <div className="bounds">
+        <div className="grid-33 centered signin">
+          <h1>Sign Up</h1>
+          <ValidationErrors errors={this.state.errors} />
+          <Form
+            errors={this.state.errors}
+            cancel={this.handleCancel}
+            submit={this.handleSubmit}
+            submitButtonText="Sign Up"
+            elements={() => (
+              <React.Fragment>
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  placeholder="First Name"
+                  value={this.state.firstName}
+                  onChange={this.handleFormInputChange}
+                />
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  placeholder="Last Name"
+                  value={this.state.lastName}
+                  onChange={this.handleFormInputChange}
+                />
+                <input
+                  id="emailAddress"
+                  name="emailAddress"
+                  type="text"
+                  placeholder="Email Address"
+                  value={this.state.emailAddress}
+                  onChange={this.handleFormInputChange}
+                />
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  placeholder="Password"
+                  value={this.state.password}
+                  onChange={this.handleFormInputChange}
+                />
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="Confirm Password"
+                  value={this.state.confirmPassword}
+                  onChange={this.handleFormInputChange}
+                />
+              </React.Fragment>
+            )}
+          />
+          <p>&nbsp;</p>
+          <p>
+            Already have a user account? <Link to={"/signin"}>Click here</Link>{" "}
+            to sign in!
+          </p>
+        </div>
+      </div>
+    );
+  }
 }
